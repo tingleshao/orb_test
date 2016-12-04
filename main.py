@@ -29,9 +29,13 @@ def generateDistribution(database):
         histogram[i] = histogram[i] / float(len(database))
     return histogram
 
-def computeEntropy(des, prob):
+def computeEntropy(des, kp, prob):
     "compute entropy"
     entropy = 0
+    img2 = img2[0:270,240:720]
+
+    if kp.pt[0] > 270 or kp.pt[1] < 240 or kp.pt[1] > 720:
+        return 0
     for i in des:
         entropy += -1 * prob[i] * math.log(prob[i],2)
     return entropy
@@ -139,8 +143,10 @@ for i in des2:
         database.append(j)
 prob = generateDistribution(database)
 des2entropy  = []
-for d in des2:
-    des2entropy.append(computeEntropy(d, prob))
+for i in xrange(len(des2)):
+    d = des2[i]
+    p = kp2[i]
+    des2entropy.append(computeEntropy(d, p, prob))
 # rank the descriptors based on entropy
 sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
 drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
