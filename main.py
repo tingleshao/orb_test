@@ -72,8 +72,8 @@ print des2entropy
 
 
 # rank the descriptors based on entropy
-sorted_entropy1_indices = [i[0] for i in sorted(enumerate(des1entropy), key=lambda x:x[1])]
-sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1])]
+sorted_entropy1_indices = [i[0] for i in sorted(enumerate(des1entropy), key=lambda x:x[1], reverse=True)]
+sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
 
 def drawEntropyDescriptors(img, kp, entropy_indice):
     row = img.shape[0]
@@ -93,6 +93,18 @@ def drawEntropyDescriptors(img, kp, entropy_indice):
     return out
 
 drawEntropyDescriptors(img1, kp1, sorted_entropy1_indices)
+
+best_feature_index = sorted_entropy2_indices[0:4]
+
+kp2_sel = []
+des2_sel = []
+for i in xrange(4):
+    kp2_sel.append(kp2[sorted_entropy2_indices[i]])
+    des2_sel.append(des2[sorted_entropy2_indices[i]])
+matches_sel = bf.match(des1,des2_sel)
+
+
+# only use the best 4 features in entropy to match
 
 def drawMatches(img1, kp1, img2, kp2, matches):
     """
@@ -157,7 +169,6 @@ def drawMatches(img1, kp1, img2, kp2, matches):
         # colour blue
         cv2.line(out, (int(x1),int(y1)), (int(x2)+cols1,int(y2)), (255, 0, 0), 1)
 
-
     # Show the image
     cv2.imshow('Matched Features', out)
     cv2.imwrite('yyy.png', out)
@@ -172,7 +183,7 @@ matches = sorted(matches, key = lambda x:x.distance)
 
 # Draw first 10 matches.
 
-img3 = drawMatches(img1,kp1,img2,kp2,matches[10:20])
+img3 = drawMatches(img1,kp1,img2,kp2_sel,matches_sel[10:20])
 
 #plt.imshow(img3)
 
