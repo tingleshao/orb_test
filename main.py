@@ -67,15 +67,31 @@ for d in des2:
     des2entropy.append(computeEntropy(d, prob))
 
 print des1entropy
-
 print " ------ "
 print des2entropy
 
 
+# rank the descriptors based on entropy
+sorted_entropy1_indices = [i[0] for i in sorted(enumerate(des1entropy), key=lambda x:x[1])]
+sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1])]
 
+def drawEntropyDescriptors(img, kp, entropy_indice):
+    row = img.shape[0]
+    col = img.shape[1]
+    out = np.zeros((row, col, 3), dtype='uint8')
+    out[:row, col] = np.dstack([img, img, img])
 
+    for i in xrange(len(entropy_indice)):
+        # select the rannked feature
+        p = kp[entropy_indice[i]]
+        color = 255 * entropy_indice[i] / len(entropy_indice[i])
+        cv2.circle(out, (int(p[0]), int(p[1])), 4, (color, 0, 0), 1)
+    cv2.imshow('Features with entropy', out)
+    cv2.waitKey(0)
+    cv2.destroyWindow('Features with entropy')
+    return out
 
-
+drawEntropyDescriptors(img1, kp1, sorted_entropy1_indices)
 
 def drawMatches(img1, kp1, img2, kp2, matches):
     """
