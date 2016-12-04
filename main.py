@@ -128,7 +128,7 @@ video_name = 'move.mp4'
 
 img2 = cv2.imread('ref1.png',0) # trainImage
 img2 = cv2.resize(img2,(960, 540), interpolation = cv2.INTER_CUBIC)
-
+img2 = img2[240:720,0:270]
 # Initiate SIFT detector
 orb = cv2.ORB_create()
 # find the keypoints and descriptors with SIFT
