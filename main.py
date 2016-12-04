@@ -66,9 +66,9 @@ des2entropy  = []
 for d in des2:
     des2entropy.append(computeEntropy(d, prob))
 
-print des1entropy
+#print des1entropy
 print " ------ "
-print des2entropy
+#print des2entropy
 
 
 # rank the descriptors based on entropy
@@ -93,15 +93,19 @@ def drawEntropyDescriptors(img, kp, entropy_indice):
     return out
 
 drawEntropyDescriptors(img1, kp1, sorted_entropy1_indices)
+drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
 
 best_feature_index = sorted_entropy2_indices[0:4]
 
-kp2_sel = []
-des2_sel = []
-for i in xrange(4):
-    kp2_sel.append(kp2[sorted_entropy2_indices[i]])
-    des2_sel.append(des2[sorted_entropy2_indices[i]])
-matches_sel = bf.match(des1,des2_sel)
+kp1_sel = np.array([kp1[sorted_entropy1_indices[0]],kp1[sorted_entropy1_indices[1]],kp1[sorted_entropy1_indices[2]],kp1[sorted_entropy1_indices[3]]])
+des1_sel = np.array([des1[sorted_entropy1_indices[0]],des1[sorted_entropy1_indices[1]],des1[sorted_entropy1_indices[2]],des1[sorted_entropy1_indices[3]]])
+#for i in xrange(4):
+#    kp2_sel.append(kp2[sorted_entropy2_indices[i]])
+#    des2_sel.append(des2[sorted_entropy2_indices[i]])
+
+#rint kp2_sel
+#rint des2_sel
+matches_sel = bf.match(des1_sel,des2)
 
 
 # only use the best 4 features in entropy to match
@@ -183,7 +187,8 @@ matches = sorted(matches, key = lambda x:x.distance)
 
 # Draw first 10 matches.
 
-img3 = drawMatches(img1,kp1,img2,kp2_sel,matches_sel[10:20])
+print  matches_sel
+img3 = drawMatches(img1,kp1_sel,img2,kp2,matches_sel)
 
 #plt.imshow(img3)
 
