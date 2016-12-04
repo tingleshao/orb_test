@@ -2,79 +2,8 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 import math
-#cv2.ocl.setUseOpenCL(False)
-img1 = cv2.imread('box.png',0)          # queryImage
-img2 = cv2.imread('box_in_scene.png',0) # trainImage
 
-# Initiate SIFT detector
-orb = cv2.ORB_create()
-
-# find the keypoints and descriptors with SIFT
-kp1, des1 = orb.detectAndCompute(img1,None)
-kp2, des2 = orb.detectAndCompute(img2,None)
-
-print len(des1)
-print len(des1[0])
-print des1
-#print size(des2)
-print len(des2)
-print len(des2[0])
-print des2
-
-# create BFMatcher object
-bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-
-# Match descriptors.
-matches = bf.match(des1,des2)
-
-print des1[0]
-print des1[0][0]
-
-database = []
-for i in des1:
-    for j in i:
-        database.append(j)
-
-for i in des2:
-    for j in i:
-        database.append(j)
-
-def generateDistribution(database):
-    histogram = [0 ] * 256
-    for i in database:
-        histogram[i] += 1
-    for i in xrange(len(histogram)):
-        histogram[i] = histogram[i] / float(len(database))
-    return histogram
-
-prob = generateDistribution(database)
-
-
-def computeEntropy(des, prob):
-    "compute entropy"
-    entropy = 0
-    for i in des:
-        entropy += -1 * prob[i] * math.log(prob[i],2)
-    return entropy
-
-
-des1entropy = []
-for d in des1:
-    des1entropy.append(computeEntropy(d, prob))
-
-des2entropy  = []
-for d in des2:
-    des2entropy.append(computeEntropy(d, prob))
-
-#print des1entropy
-print " ------ "
-#print des2entropy
-
-
-# rank the descriptors based on entropy
-sorted_entropy1_indices = [i[0] for i in sorted(enumerate(des1entropy), key=lambda x:x[1], reverse=True)]
-sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
-
+# functions
 def drawEntropyDescriptors(img, kp, entropy_indice):
     row = img.shape[0]
     col = img.shape[1]
@@ -92,23 +21,20 @@ def drawEntropyDescriptors(img, kp, entropy_indice):
     cv2.destroyWindow('Features with entropy')
     return out
 
-drawEntropyDescriptors(img1, kp1, sorted_entropy1_indices)
-drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
+def generateDistribution(database):
+    histogram = [0 ] * 256
+    for i in database:
+        histogram[i] += 1
+    for i in xrange(len(histogram)):
+        histogram[i] = histogram[i] / float(len(database))
+    return histogram
 
-best_feature_index = sorted_entropy2_indices[0:4]
-
-kp1_sel = np.array([kp1[sorted_entropy1_indices[0]],kp1[sorted_entropy1_indices[1]],kp1[sorted_entropy1_indices[2]],kp1[sorted_entropy1_indices[3]]])
-des1_sel = np.array([des1[sorted_entropy1_indices[0]],des1[sorted_entropy1_indices[1]],des1[sorted_entropy1_indices[2]],des1[sorted_entropy1_indices[3]]])
-#for i in xrange(4):
-#    kp2_sel.append(kp2[sorted_entropy2_indices[i]])
-#    des2_sel.append(des2[sorted_entropy2_indices[i]])
-
-#rint kp2_sel
-#rint des2_sel
-matches_sel = bf.match(des1_sel,des2)
-
-
-# only use the best 4 features in entropy to match
+def computeEntropy(des, prob):
+    "compute entropy"
+    entropy = 0
+    for i in des:
+        entropy += -1 * prob[i] * math.log(prob[i],2)
+    return entropy
 
 def drawMatches(img1, kp1, img2, kp2, matches):
     """
@@ -132,7 +58,6 @@ def drawMatches(img1, kp1, img2, kp2, matches):
     matches - A list of matches of corresponding keypoints through any
               OpenCV keypoint matching algorithm
     """
-
     # Create a new output image that concatenates the two images together
     # (a.k.a) a montage
     rows1 = img1.shape[0]
@@ -182,15 +107,108 @@ def drawMatches(img1, kp1, img2, kp2, matches):
     # Also return the image if you'd like a copy
     return out
 
+#cv2.ocl.setUseOpenCL(False)
+#img1 = cv2.imread('box.png',0)          # queryImage
+#img2 = cv2.imread('box_in_scene.png',0) # trainImage
+#img2 = cv2.imread('ref.jpg', 0) # train image
+
+prepare_video_frames = True
+video_name = 'move.mp4'
+
+#cv2.imshow('frame',gray)
+#    if cv2.waitKey(1) & 0xFF == ord('q'):
+#        break
+
+#cap.release()
+#cv2.destroyAllWindows()
+
+# TODO: import real data
+
+if prepare_video_frames:
+    cap = cv2.VideoCapture(video_name)
+    count = 0
+    while(cap.isOpened()):
+        count += 1
+        ret, frame = cap.read()
+        if count == 27:
+            count = 0
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            imwrite('move' + str(count) + '.png', gray)
+
+else:
+# TODO: gaussian based feature selection
+# Initiate SIFT detector
+    orb = cv2.ORB_create()
+
+# find the keypoints and descriptors with SIFT
+    kp1, des1 = orb.detectAndCompute(img1,None)
+    kp2, des2 = orb.detectAndCompute(img2,None)
+
+    print len(des1)
+    print len(des1[0])
+    print des1
+#print size(des2)
+    print len(des2)
+    print len(des2[0])
+    print des2
+
+# create BFMatcher object
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+# Match descriptors.
+    matches = bf.match(des1,des2)
+
+    print des1[0]
+    print des1[0][0]
+
+    database = []
+    for i in des1:
+        for j in i:
+            database.append(j)
+
+    for i in des2:
+        for j in i:
+            database.append(j)
+
+    prob = generateDistribution(database)
+
+    des1entropy = []
+    for d in des1:
+        des1entropy.append(computeEntropy(d, prob))
+
+    des2entropy  = []
+    for d in des2:
+        des2entropy.append(computeEntropy(d, prob))
+
+#print des1entropy
+    print " ------ "
+#print des2entropy
+
+# rank the descriptors based on entropy
+    sorted_entropy1_indices = [i[0] for i in sorted(enumerate(des1entropy), key=lambda x:x[1], reverse=True)]
+    sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
+
+    drawEntropyDescriptors(img1, kp1, sorted_entropy1_indices)
+    drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
+
+    best_feature_index = sorted_entropy2_indices[0:4]
+
+    kp1_sel = np.array([kp1[sorted_entropy1_indices[0]],kp1[sorted_entropy1_indices[1]],kp1[sorted_entropy1_indices[2]],kp1[sorted_entropy1_indices[3]]])
+    des1_sel = np.array([des1[sorted_entropy1_indices[0]],des1[sorted_entropy1_indices[1]],des1[sorted_entropy1_indices[2]],des1[sorted_entropy1_indices[3]]])
+#for i in xrange(4):
+#    kp2_sel.append(kp2[sorted_entropy2_indices[i]])
+#    des2_sel.append(des2[sorted_entropy2_indices[i]])
+
+#rint kp2_sel
+#rint des2_sel
+    matches_sel = bf.match(des1_sel,des2)
+
+# only use the best 4 features in entropy to match
+
 # Sort them in the order of their distance.
-matches = sorted(matches, key = lambda x:x.distance)
+    matches = sorted(matches, key = lambda x:x.distance)
 
 # Draw first 10 matches.
-
-print  matches_sel
-img3 = drawMatches(img1,kp1_sel,img2,kp2,matches_sel)
-
-#plt.imshow(img3)
-
-#plt.imshow(img1)
-plt.show()
+    print matches_sel
+    img3 = drawMatches(img1,kp1_sel,img2,kp2,matches_sel)
+    plt.show()
