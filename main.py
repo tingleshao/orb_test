@@ -83,7 +83,7 @@ def drawEntropyDescriptors(img, kp, entropy_indice):
 
     for i in xrange(len(entropy_indice)):
         # select the rannked feature
-        p = kp[entropy_indice[i]]
+        p = kp[entropy_indice[i]].pt
         color = 255 * entropy_indice[i] / len(entropy_indice[i])
         cv2.circle(out, (int(p[0]), int(p[1])), 4, (color, 0, 0), 1)
     cv2.imshow('Features with entropy', out)
