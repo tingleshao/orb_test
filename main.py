@@ -112,103 +112,53 @@ def drawMatches(img1, kp1, img2, kp2, matches):
 #img2 = cv2.imread('box_in_scene.png',0) # trainImage
 #img2 = cv2.imread('ref.jpg', 0) # train image
 
-prepare_video_frames = True
+prepare_video_frames = False
 video_name = 'move.mp4'
-
-#cv2.imshow('frame',gray)
-#    if cv2.waitKey(1) & 0xFF == ord('q'):
-#        break
-
-#cap.release()
-#cv2.destroyAllWindows()
-
-# TODO: import real data
-
-if prepare_video_frames:
-    cap = cv2.VideoCapture(video_name)
-    count = 0
-    while(cap.isOpened()):
-        count += 1
-        ret, frame = cap.read()
-        if count == 27:
-            count = 0
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            imwrite('move' + str(count) + '.png', gray)
-
-else:
+#if prepare_video_frames:
+    # cap = cv2.VideoCapture(video_name)
+    # count = 0
+    # while(cap.isOpened()):
+    #     count += 1
+    #     ret, frame = cap.read()
+    #     if count == 27:
+    #         count = 0
+    #         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #         imwrite('move' + str(count) + '.png', gray)
 # TODO: gaussian based feature selection
+
+img2 = cv2.imread('ref1.png',0) # trainImage
+img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
 # Initiate SIFT detector
-    orb = cv2.ORB_create()
-
+orb = cv2.ORB_create()
 # find the keypoints and descriptors with SIFT
-    kp1, des1 = orb.detectAndCompute(img1,None)
-    kp2, des2 = orb.detectAndCompute(img2,None)
-
-    print len(des1)
-    print len(des1[0])
-    print des1
-#print size(des2)
-    print len(des2)
-    print len(des2[0])
-    print des2
+#kp1, des1 = orb.detectAndCompute(img1,None)
+kp2, des2 = orb.detectAndCompute(img2,None)
+database = []
+for i in des2:
+    for j in i:
+        database.append(j)
+prob = generateDistribution(database)
+des2entropy  = []
+for d in des2:
+    des2entropy.append(computeEntropy(d, prob))
+# rank the descriptors based on entropy
+sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
+drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
+kp2_sel = np.array([kp2[sorted_entropy2_indices[0]],kp2[sorted_entropy2_indices[1]],kp2[sorted_entropy2_indices[2]],kp2[sorted_entropy2_indices[3]]])
+des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indices[1]],des2[sorted_entropy2_indices[2]],des2[sorted_entropy2_indices[3]]])
 
 # create BFMatcher object
-    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-# Match descriptors.
-    matches = bf.match(des1,des2)
-
-    print des1[0]
-    print des1[0][0]
-
-    database = []
-    for i in des1:
-        for j in i:
-            database.append(j)
-
-    for i in des2:
-        for j in i:
-            database.append(j)
-
-    prob = generateDistribution(database)
-
-    des1entropy = []
-    for d in des1:
-        des1entropy.append(computeEntropy(d, prob))
-
-    des2entropy  = []
-    for d in des2:
-        des2entropy.append(computeEntropy(d, prob))
-
-#print des1entropy
-    print " ------ "
-#print des2entropy
-
-# rank the descriptors based on entropy
-    sorted_entropy1_indices = [i[0] for i in sorted(enumerate(des1entropy), key=lambda x:x[1], reverse=True)]
-    sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
-
-    drawEntropyDescriptors(img1, kp1, sorted_entropy1_indices)
-    drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
-
-    best_feature_index = sorted_entropy2_indices[0:4]
-
-    kp1_sel = np.array([kp1[sorted_entropy1_indices[0]],kp1[sorted_entropy1_indices[1]],kp1[sorted_entropy1_indices[2]],kp1[sorted_entropy1_indices[3]]])
-    des1_sel = np.array([des1[sorted_entropy1_indices[0]],des1[sorted_entropy1_indices[1]],des1[sorted_entropy1_indices[2]],des1[sorted_entropy1_indices[3]]])
-#for i in xrange(4):
-#    kp2_sel.append(kp2[sorted_entropy2_indices[i]])
-#    des2_sel.append(des2[sorted_entropy2_indices[i]])
-
-#rint kp2_sel
-#rint des2_sel
-    matches_sel = bf.match(des1_sel,des2)
-
+img1 = cv2.imread('move_1.png',0)          # queryImage
+img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+kp1, des1 = orb.detectAndCompute(img1,None)
+matches_sel = bf.match(des1,des2_sel)
 # only use the best 4 features in entropy to match
-
 # Sort them in the order of their distance.
-    matches = sorted(matches, key = lambda x:x.distance)
-
+#matches = sorted(matches, key = lambda x:x.distance)
 # Draw first 10 matches.
-    print matches_sel
-    img3 = drawMatches(img1,kp1_sel,img2,kp2,matches_sel)
-    plt.show()
+#print matches_sel
+img3 = drawMatches(img1,kp1_sel,img2,kp2_sel,matches_sel)
+plt.show()
