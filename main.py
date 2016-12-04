@@ -127,6 +127,7 @@ video_name = 'move.mp4'
 # TODO: gaussian based feature selection
 
 img2 = cv2.imread('ref1.png',0) # trainImage
+img2 = cv2.resize(img2,(480, 270), interpolation = cv2.INTER_CUBIC)
 
 # Initiate SIFT detector
 orb = cv2.ORB_create()
@@ -151,6 +152,8 @@ des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indic
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
 img1 = cv2.imread('move_1.png',0)          # queryImage
+img1 = cv2.resize(img1,(480, 270), interpolation = cv2.INTER_CUBIC)
+
 kp1, des1 = orb.detectAndCompute(img1,None)
 matches_sel = bf.match(des1,des2_sel)
 # only use the best 4 features in entropy to match
@@ -158,5 +161,5 @@ matches_sel = bf.match(des1,des2_sel)
 #matches = sorted(matches, key = lambda x:x.distance)
 # Draw first 10 matches.
 #print matches_sel
-img3 = drawMatches(img1,kp1_sel,img2,kp2_sel,matches_sel)
+img3 = drawMatches(img1,kp1,img2,kp2_sel,matches_sel)
 plt.show()
