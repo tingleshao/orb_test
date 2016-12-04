@@ -1,7 +1,8 @@
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
-cv2.ocl.setUseOpenCL(False)
+import math
+#cv2.ocl.setUseOpenCL(False)
 img1 = cv2.imread('box.png',0)          # queryImage
 img2 = cv2.imread('box_in_scene.png',0) # trainImage
 
@@ -12,11 +13,69 @@ orb = cv2.ORB_create()
 kp1, des1 = orb.detectAndCompute(img1,None)
 kp2, des2 = orb.detectAndCompute(img2,None)
 
+print len(des1)
+print len(des1[0])
+print des1
+#print size(des2)
+print len(des2)
+print len(des2[0])
+print des2
+
 # create BFMatcher object
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
 # Match descriptors.
 matches = bf.match(des1,des2)
+
+print des1[0]
+print des1[0][0]
+
+database = []
+for i in des1:
+    for j in i:
+        database.append(j)
+
+for i in des2:
+    for j in i:
+        database.append(j)
+
+def generateDistribution(database):
+    histogram = [0 ] * 256
+    for i in database:
+        histogram[i] += 1
+    for i in xrange(len(histogram)):
+        histogram[i] = histogram[i] / float(len(database))
+    return histogram
+
+prob = generateDistribution(database)
+
+
+def computeEntropy(des, prob):
+    "compute entropy"
+    entropy = 0
+    for i in des:
+        entropy += -1 * prob[i] * math.log(prob[i],2)
+    return entropy
+
+
+des1entropy = []
+for d in des1:
+    des1entropy.append(computeEntropy(d, prob))
+
+des2entropy  = []
+for d in des2:
+    des2entropy.append(computeEntropy(d, prob))
+
+print des1entropy
+
+print " ------ "
+print des2entropy
+
+
+
+
+
+
 
 def drawMatches(img1, kp1, img2, kp2, matches):
     """
