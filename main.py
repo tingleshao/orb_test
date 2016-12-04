@@ -10,7 +10,7 @@ def drawEntropyDescriptors(img, kp, entropy_indice):
     out = np.zeros((row, col, 3), dtype='uint8')
     out[:row, :col] = np.dstack([img, img, img])
 
-    for i in xrange(8):
+    for i in xrange(4):
         # select the rannked feature
         p = kp[entropy_indice[i]].pt
         color = 255 * entropy_indice[i] / len(entropy_indice)
@@ -32,7 +32,7 @@ def generateDistribution(database):
 def computeEntropy(des, kp, prob):
     "compute entropy"
     entropy = 0
-    img2 = img2[0:270,240:720]
+    #img2 = img2[0:270,240:720]
 
     if kp.pt[0] > 270 or kp.pt[1] < 240 or kp.pt[1] > 720:
         return 0
@@ -150,9 +150,10 @@ for i in xrange(len(des2)):
 # rank the descriptors based on entropy
 sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
 drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
-kp2_sel = np.array([kp2[sorted_entropy2_indices[0]],kp2[sorted_entropy2_indices[1]],kp2[sorted_entropy2_indices[2]],kp2[sorted_entropy2_indices[3]], kp2[sorted_entropy2_indices[4]],kp2[sorted_entropy2_indices[5]],kp2[sorted_entropy2_indices[6]],kp2[sorted_entropy2_indices[7]]])
-
-des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indices[1]],des2[sorted_entropy2_indices[2]],des2[sorted_entropy2_indices[3]],des2[sorted_entropy2_indices[4]],des2[sorted_entropy2_indices[5]],des2[sorted_entropy2_indices[6]],des2[sorted_entropy2_indices[7]]])
+#kp2_sel = np.array([kp2[sorted_entropy2_indices[0]],kp2[sorted_entropy2_indices[1]],kp2[sorted_entropy2_indices[2]],kp2[sorted_entropy2_indices[3]], kp2[sorted_entropy2_indices[4]],kp2[sorted_entropy2_indices[5]],kp2[sorted_entropy2_indices[6]],kp2[sorted_entropy2_indices[7]]])
+kp2_sel = np.array([kp2[sorted_entropy2_indices[0]],kp2[sorted_entropy2_indices[1]],kp2[sorted_entropy2_indices[2]],kp2[sorted_entropy2_indices[3]]])
+#des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indices[1]],des2[sorted_entropy2_indices[2]],des2[sorted_entropy2_indices[3]],des2[sorted_entropy2_indices[4]],des2[sorted_entropy2_indices[5]],des2[sorted_entropy2_indices[6]],des2[sorted_entropy2_indices[7]]])
+des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indices[1]],des2[sorted_entropy2_indices[2]],des2[sorted_entropy2_indices[3]]])
 
 # create BFMatcher object
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
