@@ -10,7 +10,7 @@ def drawEntropyDescriptors(img, kp, entropy_indice):
     out = np.zeros((row, col, 3), dtype='uint8')
     out[:row, :col] = np.dstack([img, img, img])
 
-    for i in xrange(20):
+    for i in xrange(4):
         # select the rannked feature
         p = kp[entropy_indice[i]].pt
         color = 255 * entropy_indice[i] / len(entropy_indice)
@@ -127,7 +127,7 @@ video_name = 'move.mp4'
 # TODO: gaussian based feature selection
 
 img2 = cv2.imread('ref1.png',0) # trainImage
-img2 = cv2.resize(img2,(480, 270), interpolation = cv2.INTER_CUBIC)
+img2 = cv2.resize(img2,(960, 540), interpolation = cv2.INTER_CUBIC)
 
 # Initiate SIFT detector
 orb = cv2.ORB_create()
@@ -152,7 +152,7 @@ des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indic
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
 img1 = cv2.imread('move_1.png',0)          # queryImage
-img1 = cv2.resize(img1,(480, 270), interpolation = cv2.INTER_CUBIC)
+img1 = cv2.resize(img1,(960, 540), interpolation = cv2.INTER_CUBIC)
 
 kp1, des1 = orb.detectAndCompute(img1,None)
 matches_sel = bf.match(des1,des2_sel)
