@@ -79,7 +79,7 @@ def drawEntropyDescriptors(img, kp, entropy_indice):
     row = img.shape[0]
     col = img.shape[1]
     out = np.zeros((row, col, 3), dtype='uint8')
-    out[:row, col] = np.dstack([img, img, img])
+    out[:row, :col] = np.dstack([img, img, img])
 
     for i in xrange(len(entropy_indice)):
         # select the rannked feature
