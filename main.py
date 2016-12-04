@@ -81,17 +81,13 @@ def drawEntropyDescriptors(img, kp, entropy_indice):
     out = np.zeros((row, col, 3), dtype='uint8')
     out[:row, :col] = np.dstack([img, img, img])
 
-    for i in xrange(len(entropy_indice)):
+    for i in xrange(20):
         # select the rannked feature
-<<<<<<< HEAD
-        p = kp[entropy_indice[i]]
-        color = 255 * entropy_indice[i] / len(entropy_indice)
-=======
         p = kp[entropy_indice[i]].pt
-        color = 255 * entropy_indice[i] / len(entropy_indice[i])
->>>>>>> 27ce19e750be48ecfef077b2350e37f8c956e758
-        cv2.circle(out, (int(p[0]), int(p[1])), 4, (color, 0, 0), 1)
+        color = 255 * entropy_indice[i] / len(entropy_indice)
+        cv2.circle(out, (int(p[0]), int(p[1])), 4, (color, 255 - color, 0), 1)
     cv2.imshow('Features with entropy', out)
+    cv2.imwrite('xxx.png',out)
     cv2.waitKey(0)
     cv2.destroyWindow('Features with entropy')
     return out
@@ -164,6 +160,7 @@ def drawMatches(img1, kp1, img2, kp2, matches):
 
     # Show the image
     cv2.imshow('Matched Features', out)
+    cv2.imwrite('yyy.png', out)
     cv2.waitKey(0)
     cv2.destroyWindow('Matched Features')
 
@@ -175,10 +172,9 @@ matches = sorted(matches, key = lambda x:x.distance)
 
 # Draw first 10 matches.
 
-img3 = drawMatches(img1,kp1,img2,kp2,matches[:100])
+img3 = drawMatches(img1,kp1,img2,kp2,matches[10:20])
 
 #plt.imshow(img3)
 
 #plt.imshow(img1)
-#plt.savefig("xxx.png")
 plt.show()
