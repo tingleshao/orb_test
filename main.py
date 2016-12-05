@@ -33,11 +33,15 @@ def computeEntropy(des, kp, prob, method):
     "compute entropy"
     entropy = 0
     #img2 = img2[0:270,240:720]
-
-    if kp.pt[0] > 270 or kp.pt[1] < 240 or kp.pt[1] > 720:
-        return 0
-    for i in des:
-        entropy += -1 * prob[i] * math.log(prob[i],2)
+    if method == 'crop':
+        if kp.pt[0] > 270 or kp.pt[1] < 240 or kp.pt[1] > 720:
+            return 0
+        for i in des:
+            entropy += -1 * prob[i] * math.log(prob[i],2)
+    elif method == 'gaussian':
+        for i in des:
+            entropy += -1 * prob[i] * math.log(prob[i],2)
+        entropy = entropy * xxx
     return entropy
 
 def drawMatches(img1, kp1, img2, kp2, matches):
@@ -111,6 +115,32 @@ def drawMatches(img1, kp1, img2, kp2, matches):
     # Also return the image if you'd like a copy
     return out
 
+
+def makeGaussian(size, fwhm = 3, center=None):
+    """ Make a square gaussian kernel.
+    size is the length of a side of the square
+    fwhm is full-width-half-maximum, which
+    can be thought of as an effective radius.
+    """
+
+    x = np.arange(0, size, 1, float)
+    y = x[:,np.newaxis]
+
+    if center is None:
+        x0 = y0 = size // 2
+    else:
+        x0 = center[0]
+        y0 = center[1]
+
+    return np.exp(-4*np.log(2) * ((x-x0)**2 + (y-y0)**2) / fwhm**2)
+
+
+# Show the image
+cv2.imshow('Matched Features', makeGaussian(300))
+#cv2.imwrite('yyy.png', out)
+cv2.waitKey(0)
+cv2.destroyWindow('Matched Features')
+
 #cv2.ocl.setUseOpenCL(False)
 #img1 = cv2.imread('box.png',0)          # queryImage
 #img2 = cv2.imread('box_in_scene.png',0) # trainImage
@@ -146,7 +176,7 @@ des2entropy  = []
 for i in xrange(len(des2)):
     d = des2[i]
     p = kp2[i]
-    des2entropy.append(computeEntropy(d, p, prob))
+    des2entropy.append(computeEntropy(d, p, prob, "crop"))
 # rank the descriptors based on entropy
 sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
 drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
