@@ -116,16 +116,15 @@ def drawMatches(img1, kp1, img2, kp2, matches):
     return out
 
 
-def makeGaussian(size, fwhm = 150, center=None):
+def makeGaussian(width, height, fwhm=150, center=None):
     """ Make a square gaussian kernel.
     size is the length of a side of the square
     fwhm is full-width-half-maximum, which
     can be thought of as an effective radius.
     """
-
     x = np.arange(0, size, 1, float)
     y = x[:,np.newaxis]
-
+    center = (480, 135)
     if center is None:
         x0 = y0 = size // 2
     else:
@@ -136,7 +135,7 @@ def makeGaussian(size, fwhm = 150, center=None):
 
 
 # Show the image
-blob = makeGaussian(300)
+blob = makeGaussian(960, 540)
 print blob
 print "------"
 print blob[150][150]
