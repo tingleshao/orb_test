@@ -122,8 +122,9 @@ def makeGaussian(width, height, fwhm=150, center=None):
     fwhm is full-width-half-maximum, which
     can be thought of as an effective radius.
     """
-    x = np.arange(0, size, 1, float)
-    y = x[:,np.newaxis]
+    x = np.arange(0, width, 1, float)
+    yy = np.arange(0, height, 1, float)
+    y = yy[:,np.newaxis]
     center = (480, 135)
     if center is None:
         x0 = y0 = size // 2
@@ -131,7 +132,7 @@ def makeGaussian(width, height, fwhm=150, center=None):
         x0 = center[0]
         y0 = center[1]
 
-    return np.exp(-4*np.log(2) * ((x-x0)**2 + (y-y0)**2) / fwhm**2)
+    return np.exp(-4*np.log(2) * (((x-x0)/(480))**2 + ((y-y0)/(135))**2))
 
 
 # Show the image
