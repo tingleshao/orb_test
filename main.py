@@ -116,7 +116,7 @@ def drawMatches(img1, kp1, img2, kp2, matches):
     return out
 
 
-def makeGaussian(size, fwhm = 3, center=None):
+def makeGaussian(size, fwhm = 150, center=None):
     """ Make a square gaussian kernel.
     size is the length of a side of the square
     fwhm is full-width-half-maximum, which
@@ -136,7 +136,11 @@ def makeGaussian(size, fwhm = 3, center=None):
 
 
 # Show the image
-cv2.imshow('Matched Features', makeGaussian(300))
+blob = makeGaussian(300)
+print blob
+print "------"
+print blob[150][150]
+cv2.imshow('Matched Features', blob)
 #cv2.imwrite('yyy.png', out)
 cv2.waitKey(0)
 cv2.destroyWindow('Matched Features')
