@@ -41,7 +41,7 @@ def computeEntropy(des, kp, prob, method, gaussian):
     elif method == 'gaussian':
         for i in des:
             entropy += -1 * prob[i] * math.log(prob[i],2)
-        entropy = entropy * gaussian[kp.pt[0],kp.pt[1]]
+        entropy = entropy * gaussian[kp.pt[1],kp.pt[0]]
     return entropy
 
 def drawMatches(img1, kp1, img2, kp2, matches):
@@ -132,7 +132,7 @@ def makeGaussian(width, height, fwhm=150, center=None):
         x0 = center[0]
         y0 = center[1]
 
-    return np.exp(-4*np.log(2) * (((x-x0)/(480))**2 + ((y-y0)/(135))**2))
+    return np.exp(-4*np.log(2) * (((x-x0)/(700))**2 + ((y-y0)/(200))**2))
 
 
 # Show the image
@@ -180,7 +180,7 @@ des2entropy  = []
 for i in xrange(len(des2)):
     d = des2[i]
     p = kp2[i]
-    des2entropy.append(computeEntropy(d, p, prob, "crop"))
+    des2entropy.append(computeEntropy(d, p, prob, "crop", blob))
 # rank the descriptors based on entropy
 sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
 drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
@@ -192,7 +192,7 @@ des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indic
 # create BFMatcher object
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-img1 = cv2.imread('move_1.png',0)          # queryImage
+img1 = cv2.imread('mm1.png',0)          # queryImage
 img1 = cv2.resize(img1,(960, 540), interpolation = cv2.INTER_CUBIC)
 
 kp1, des1 = orb.detectAndCompute(img1,None)
