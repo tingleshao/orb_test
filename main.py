@@ -29,7 +29,7 @@ def generateDistribution(database):
         histogram[i] = histogram[i] / float(len(database))
     return histogram
 
-def computeEntropy(des, kp, prob, method):
+def computeEntropy(des, kp, prob, method, gaussian):
     "compute entropy"
     entropy = 0
     #img2 = img2[0:270,240:720]
@@ -41,7 +41,7 @@ def computeEntropy(des, kp, prob, method):
     elif method == 'gaussian':
         for i in des:
             entropy += -1 * prob[i] * math.log(prob[i],2)
-        entropy = entropy * xxx
+        entropy = entropy * gaussian[kp.pt[0],kp.pt[1]]
     return entropy
 
 def drawMatches(img1, kp1, img2, kp2, matches):
@@ -139,7 +139,7 @@ def makeGaussian(width, height, fwhm=150, center=None):
 blob = makeGaussian(960, 540)
 print blob
 print "------"
-print blob[150][150]
+print blob[135,480]
 cv2.imshow('Matched Features', blob)
 #cv2.imwrite('yyy.png', out)
 cv2.waitKey(0)
