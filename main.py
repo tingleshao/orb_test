@@ -192,15 +192,16 @@ des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indic
 # create BFMatcher object
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-img1 = cv2.imread('mm1.png',0)          # queryImage
-img1 = cv2.resize(img1,(960, 540), interpolation = cv2.INTER_CUBIC)
+for i in xrange(10):
+    img1 = cv2.imread('mm' + str(i) + '.png',0)          # queryImage
+    img1 = cv2.resize(img1,(960, 540), interpolation = cv2.INTER_CUBIC)
 
-kp1, des1 = orb.detectAndCompute(img1,None)
-matches_sel = bf.match(des1,des2_sel)
+    kp1, des1 = orb.detectAndCompute(img1,None)
+    matches_sel = bf.match(des1,des2_sel)
 # only use the best 4 features in entropy to match
 # Sort them in the order of their distance.
 #matches = sorted(matches, key = lambda x:x.distance)
 # Draw first 10 matches.
 #print matches_sel
-img3 = drawMatches(img1,kp1,img2,kp2_sel,matches_sel)
-plt.show()
+    img3 = drawMatches(img1,kp1,img2,kp2_sel,matches_sel)
+    plt.show()
