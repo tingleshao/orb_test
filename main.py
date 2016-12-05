@@ -29,7 +29,7 @@ def generateDistribution(database):
         histogram[i] = histogram[i] / float(len(database))
     return histogram
 
-def computeEntropy(des, kp, prob):
+def computeEntropy(des, kp, prob, method):
     "compute entropy"
     entropy = 0
     #img2 = img2[0:270,240:720]
