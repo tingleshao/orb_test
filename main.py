@@ -180,7 +180,7 @@ des2entropy  = []
 for i in xrange(len(des2)):
     d = des2[i]
     p = kp2[i]
-    des2entropy.append(computeEntropy(d, p, prob, "crop", blob))
+    des2entropy.append(computeEntropy(d, p, prob, "gaussian", blob))
 # rank the descriptors based on entropy
 sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
 drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
@@ -193,7 +193,7 @@ des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indic
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
 for i in xrange(10):
-    img1 = cv2.imread('mm' + str(i) + '.png',0)          # queryImage
+    img1 = cv2.imread('m' + str(i) + '.png',0)          # queryImage
     img1 = cv2.resize(img1,(960, 540), interpolation = cv2.INTER_CUBIC)
 
     kp1, des1 = orb.detectAndCompute(img1,None)
