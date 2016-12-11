@@ -3,6 +3,8 @@ import cv2
 from matplotlib import pyplot as plt
 import math
 
+showed = False
+
 # functions
 def drawEntropyDescriptors(img, kp, entropy_indice):
     row = img.shape[0]
@@ -14,9 +16,9 @@ def drawEntropyDescriptors(img, kp, entropy_indice):
         # select the rannked feature
         p = kp[entropy_indice[i]].pt
         color = 255 * entropy_indice[i] / len(entropy_indice)
-        cv2.circle(out, (int(p[0]), int(p[1])), 4, (color, 255 - color, 0), 1)
+        cv2.circle(out, (int(p[0]), int(p[1])), 4, (255, 0, 0), 1)
     cv2.imshow('Features with entropy', out)
-    cv2.imwrite('xxx.png',out)
+    cv2.imwrite('www.png',out)
     cv2.waitKey(0)
     cv2.destroyWindow('Features with entropy')
     return out
@@ -108,7 +110,10 @@ def drawMatches(img1, kp1, img2, kp2, matches):
 
     # Show the image
     cv2.imshow('Matched Features', out)
-    cv2.imwrite('yyy.png', out)
+    global showed
+    if not showed:
+        cv2.imwrite('yyy.png', out)
+        showed = True
     cv2.waitKey(0)
     cv2.destroyWindow('Matched Features')
 
@@ -141,6 +146,7 @@ print blob
 print "------"
 print blob[135,480]
 cv2.imshow('Matched Features', blob)
+cv2.imwrite('zzz.png', blob * 255)
 #cv2.imwrite('yyy.png', out)
 cv2.waitKey(0)
 cv2.destroyWindow('Matched Features')
@@ -164,7 +170,7 @@ video_name = 'move.mp4'
     #         imwrite('move' + str(count) + '.png', gray)
 # TODO: gaussian based feature selection
 
-img2 = cv2.imread('ref1.png',0) # trainImage
+img2 = cv2.imread('m0.png',0) # trainImage
 img2 = cv2.resize(img2,(960, 540), interpolation = cv2.INTER_CUBIC)
 # Initiate SIFT detector
 orb = cv2.ORB_create()
@@ -183,17 +189,22 @@ for i in xrange(len(des2)):
     des2entropy.append(computeEntropy(d, p, prob, "gaussian", blob))
 # rank the descriptors based on entropy
 sorted_entropy2_indices = [i[0] for i in sorted(enumerate(des2entropy), key=lambda x:x[1], reverse=True)]
+#sorted_entropy2_indices = [82, 72, 15, 66];
 drawEntropyDescriptors(img2, kp2, sorted_entropy2_indices)
 #kp2_sel = np.array([kp2[sorted_entropy2_indices[0]],kp2[sorted_entropy2_indices[1]],kp2[sorted_entropy2_indices[2]],kp2[sorted_entropy2_indices[3]], kp2[sorted_entropy2_indices[4]],kp2[sorted_entropy2_indices[5]],kp2[sorted_entropy2_indices[6]],kp2[sorted_entropy2_indices[7]]])
 kp2_sel = np.array([kp2[sorted_entropy2_indices[0]],kp2[sorted_entropy2_indices[1]],kp2[sorted_entropy2_indices[2]],kp2[sorted_entropy2_indices[3]]])
 #des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indices[1]],des2[sorted_entropy2_indices[2]],des2[sorted_entropy2_indices[3]],des2[sorted_entropy2_indices[4]],des2[sorted_entropy2_indices[5]],des2[sorted_entropy2_indices[6]],des2[sorted_entropy2_indices[7]]])
 des2_sel = np.array([des2[sorted_entropy2_indices[0]],des2[sorted_entropy2_indices[1]],des2[sorted_entropy2_indices[2]],des2[sorted_entropy2_indices[3]]])
 
+
+
 # create BFMatcher object
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-for i in xrange(10):
-    img1 = cv2.imread('m' + str(i) + '.png',0)          # queryImage
+#for i in xrange(1,28):
+for i in xrange(1):
+    #img1 = cv2.imread('m' + str(i) + '.png',0)          # queryImage
+    img1 = cv2.imread('ref1' + '.png',0)          # queryImage
     img1 = cv2.resize(img1,(960, 540), interpolation = cv2.INTER_CUBIC)
 
     kp1, des1 = orb.detectAndCompute(img1,None)
